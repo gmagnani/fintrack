@@ -8,6 +8,7 @@ export const AuthContext = createContext({
     user: null,
     login: () => {},
     signup: () => {},
+    isInitializing: true,
 });
 
 const LOCAL_STORAGE_ACCESS_TOKEN_KEY = 'accessToken';
@@ -25,6 +26,7 @@ const removeTokens = () => {
 
 export const AuthContextProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [isInitializing, setIsInitializing] = useState(true);
     const signupMutation = useMutation({
         mutationKey: ['signup'],
         mutationFn: async (data) => {
@@ -51,6 +53,7 @@ export const AuthContextProvider = ({ children }) => {
     useEffect(() => {
         const init = async () => {
             try {
+                setIsInitializing(true);
                 const accessToken = localStorage.getItem(
                     LOCAL_STORAGE_ACCESS_TOKEN_KEY
                 );
@@ -65,8 +68,11 @@ export const AuthContextProvider = ({ children }) => {
                 });
                 setUser(response.data);
             } catch (error) {
+                setUser(null);
                 removeTokens();
                 console.log(error);
+            } finally {
+                setIsInitializing(false);
             }
         };
         init();
@@ -103,6 +109,7 @@ export const AuthContextProvider = ({ children }) => {
                 user: user,
                 login: login,
                 signup: signup,
+                isInitializing: isInitializing,
             }}
         >
             {children}
