@@ -1,6 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 import PasswordInput from '@/components/password-input';
@@ -23,35 +26,54 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { api } from '@/lib/axios';
 
-const signupSchema = z.object({
-    firstName: z.string().trim().min(1, {
-        message: 'O nome é obrigatório',
-    }),
-    lastName: z.string().trim().min(1, {
-        message: 'O sobrenome é obrigatório',
-    }),
-    email: z
-        .string()
-        .email({
-            message: 'O email é inválido',
-        })
-        .trim()
-        .min(1, {
-            message: 'O email é obrigatório',
+const signupSchema = z
+    .object({
+        firstName: z.string().trim().min(1, {
+            message: 'O nome é obrigatório',
         }),
-    password: z.string().trim().min(6, {
-        message: 'A senha deve ter no mínimo 6 caracteres',
-    }),
-    confirmPassword: z.string().trim().min(6, {
-        message: 'A confirmação de senha é obrigatória',
-    }),
-    terms: z.boolean().refine((value) => value === true, {
-        message: 'Você deve aceitar os termos de uso',
-    }),
-});
+        lastName: z.string().trim().min(1, {
+            message: 'O sobrenome é obrigatório',
+        }),
+        email: z
+            .string()
+            .email({
+                message: 'O email é inválido',
+            })
+            .trim()
+            .min(1, {
+                message: 'O email é obrigatório',
+            }),
+        password: z.string().trim().min(6, {
+            message: 'A senha deve ter no mínimo 6 caracteres',
+        }),
+        confirmPassword: z.string().trim().min(6, {
+            message: 'A confirmação de senha é obrigatória',
+        }),
+        terms: z.boolean().refine((value) => value === true, {
+            message: 'Você deve aceitar os termos de uso',
+        }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        path: ['confirmPassword'],
+        message: 'As senhas não conferem',
+    });
 
 const SignupPage = () => {
+    const [user, setUser] = useState(null);
+    const signupMutation = useMutation({
+        mutationKey: ['signup'],
+        mutationFn: async (data) => {
+            const response = await api.post('/users', {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                password: data.password,
+            });
+            return response.data;
+        },
+    });
     const methodes = useForm({
         resolver: zodResolver(signupSchema),
         defaultValues: {
@@ -65,8 +87,22 @@ const SignupPage = () => {
     });
 
     const handleSubmit = (data) => {
-        console.log(data);
+        signupMutation.mutate(data, {
+            onSuccess: (createdUser) => {
+                const accessToken = createdUser.token.accessToken;
+                const refreshToken = createdUser.token.refreshToken;
+                setUser(createdUser);
+                localStorage.setItem('accesstoken', accessToken);
+                localStorage.setItem('refreshToken', refreshToken);
+                toast.success('Usuário criado com sucesso!');
+            },
+            onError: () => {
+                toast.error('Erro ao criar usuário!');
+            },
+        });
     };
+
+    if (user) return <h1>Usuário criado com sucesso!</h1>;
 
     return (
         <div className="flex h-screen w-screen flex-col items-center justify-center gap-3">
