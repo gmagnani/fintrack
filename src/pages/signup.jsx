@@ -109,8 +109,8 @@ const SignupPage = () => {
     const handleSubmit = (data) => {
         signupMutation.mutate(data, {
             onSuccess: (createdUser) => {
-                const accessToken = createdUser.token.accessToken;
-                const refreshToken = createdUser.token.refreshToken;
+                const accessToken = createdUser.tokens.accessToken;
+                const refreshToken = createdUser.tokens.refreshToken;
                 setUser(createdUser);
                 localStorage.setItem('accesstoken', accessToken);
                 localStorage.setItem('refreshToken', refreshToken);
