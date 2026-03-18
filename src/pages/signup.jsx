@@ -1,9 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router';
-import { toast } from 'sonner';
 import { z } from 'zod';
 
 import PasswordInput from '@/components/password-input';
@@ -26,7 +24,7 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { api } from '@/lib/axios';
+import { AuthContext } from '@/context/auth';
 
 const signupSchema = z
     .object({
@@ -61,19 +59,8 @@ const signupSchema = z
     });
 
 const SignupPage = () => {
-    const [user, setUser] = useState(null);
-    const signupMutation = useMutation({
-        mutationKey: ['signup'],
-        mutationFn: async (data) => {
-            const response = await api.post('/users', {
-                firstName: data.firstName,
-                lastName: data.lastName,
-                email: data.email,
-                password: data.password,
-            });
-            return response.data;
-        },
-    });
+    const { user, signup } = useContext(AuthContext);
+
     const methodes = useForm({
         resolver: zodResolver(signupSchema),
         defaultValues: {
@@ -86,40 +73,8 @@ const SignupPage = () => {
         },
     });
 
-    useEffect(() => {
-        const init = async () => {
-            try {
-                const accessToken = localStorage.getItem('accesstoken');
-                const refreshToken = localStorage.getItem('refreshToken');
-                if (!accessToken && !refreshToken) return;
-                const response = await api.get('/users/me', {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                });
-                setUser(response.data);
-            } catch (error) {
-                localStorage.removeItem('accesstoken');
-                localStorage.removeItem('refreshToken');
-                console.log(error);
-            }
-        };
-        init();
-    }, []);
     const handleSubmit = (data) => {
-        signupMutation.mutate(data, {
-            onSuccess: (createdUser) => {
-                const accessToken = createdUser.tokens.accessToken;
-                const refreshToken = createdUser.tokens.refreshToken;
-                setUser(createdUser);
-                localStorage.setItem('accesstoken', accessToken);
-                localStorage.setItem('refreshToken', refreshToken);
-                toast.success('Usuário criado com sucesso!');
-            },
-            onError: () => {
-                toast.error('Erro ao criar usuário!');
-            },
-        });
+        signup(data);
     };
 
     if (user) return <h1>Usuário criado com sucesso!</h1>;
