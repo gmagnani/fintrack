@@ -15,7 +15,8 @@ const PasswordInput = forwardRef(({ placeholder, ...props }, ref) => {
                 {...props}
             />
             <Button
-                className="absolute bottom-0 right-0 top-0 my-auto mr-1 w-8 text-muted-foreground"
+                type="button"
+                className="absolute bottom-0 right-0 top-0 my-auto mr-1 w-8 text-muted-foreground hover:bg-transparent"
                 variant="ghost"
                 onClick={() => setPasswordIsVisible((prev) => !prev)}
             >
