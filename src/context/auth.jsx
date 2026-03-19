@@ -8,6 +8,7 @@ export const AuthContext = createContext({
     user: null,
     login: () => {},
     signup: () => {},
+    logout: () => {},
     isInitializing: true,
 });
 
@@ -91,6 +92,12 @@ export const AuthContextProvider = ({ children }) => {
         });
     };
 
+    const logout = () => {
+        setUser(null);
+        removeTokens();
+        toast.success('Usuário deslogado com sucesso!');
+    };
+
     const login = (data) => {
         loginMutation.mutate(data, {
             onSuccess: (loggedUser) => {
@@ -109,6 +116,7 @@ export const AuthContextProvider = ({ children }) => {
                 user: user,
                 login: login,
                 signup: signup,
+                logout: logout,
                 isInitializing: isInitializing,
             }}
         >

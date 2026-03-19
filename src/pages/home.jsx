@@ -1,9 +1,10 @@
 import { Navigate } from 'react-router';
 
+import { Button } from '@/components/ui/button';
 import { useAuthContext } from '@/context/auth';
 
 const HomePage = () => {
-    const { user, isInitializing } = useAuthContext();
+    const { user, isInitializing, logout } = useAuthContext();
 
     if (isInitializing) {
         return null;
@@ -17,6 +18,7 @@ const HomePage = () => {
         <div>
             <h1>Home Page</h1>
             <p>Usuário {user.first_name} logado com sucesso!</p>
+            <Button onClick={logout}>Sair</Button>
         </div>
     );
 };
