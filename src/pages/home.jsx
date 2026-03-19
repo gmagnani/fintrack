@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router';
 
+import DateSelection from '@/components/date-selection';
 import Header from '@/components/header';
 import { useAuthContext } from '@/context/auth';
 
@@ -19,7 +20,9 @@ const HomePage = () => {
             <Header />
             <div className="flex items-center justify-between p-4">
                 <h2>Dashboard</h2>
-                <div></div>
+                <div>
+                    <DateSelection />
+                </div>
             </div>
         </div>
     );
