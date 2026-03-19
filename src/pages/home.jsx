@@ -17,7 +17,7 @@ const HomePage = () => {
     return (
         <div>
             <h1>Home Page</h1>
-            <p>Usuário {user.first_name} logado com sucesso!</p>
+            <p>Usuário {user.firstName} logado com sucesso!</p>
             <Button onClick={logout}>Sair</Button>
         </div>
     );
