@@ -17,6 +17,10 @@ const HomePage = () => {
     return (
         <div>
             <Header />
+            <div className="flex items-center justify-between p-4">
+                <h2>Dashboard</h2>
+                <div></div>
+            </div>
         </div>
     );
 };
