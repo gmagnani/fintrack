@@ -89,7 +89,7 @@ const TransactionTypeChart = () => {
                                         size={16}
                                     />
                                 }
-                                label="Gastos"
+                                label="Ganhos"
                             />
                         }
                         value={`${data?.earningsPercentage}%`}
