@@ -39,4 +39,13 @@ export const UserService = {
             tokens: response.data.tokens,
         };
     },
+    getBalance: async (data) => {
+        const queryParams = new URLSearchParams();
+        queryParams.set('from', data.from);
+        queryParams.set('to', data.to);
+        const response = await api.get(
+            `/users/me/balance?${queryParams.toString()}`
+        );
+        return response.data;
+    },
 };
