@@ -1,6 +1,6 @@
 import { ChevronDownIcon, LogOutIcon } from 'lucide-react';
 
-import { useAuthContext } from '@/context/auth';
+import { useAuthContext } from '@/contexts/auth';
 
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
@@ -15,7 +15,7 @@ import {
 } from './ui/dropdown-menu';
 
 const Header = () => {
-    const { user, logout } = useAuthContext();
+    const { user, signOut } = useAuthContext();
     return (
         <Card>
             <CardContent className="flex items-center justify-between px-8 py-4">
@@ -42,7 +42,7 @@ const Header = () => {
                         <DropdownMenuContent>
                             <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={logout}>
+                            <DropdownMenuItem onClick={signOut}>
                                 <Button variant="ghost">
                                     <LogOutIcon />
                                     Sair

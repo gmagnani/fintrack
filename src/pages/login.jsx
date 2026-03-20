@@ -22,7 +22,7 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useAuthContext } from '@/context/auth';
+import { useAuthContext } from '@/contexts/auth';
 
 const loginSchema = z.object({
     email: z

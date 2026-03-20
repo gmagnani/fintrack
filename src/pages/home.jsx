@@ -4,7 +4,7 @@ import AddTransactionButton from '@/components/add-transaction-button';
 import Balance from '@/components/balance';
 import DateSelection from '@/components/date-selection';
 import Header from '@/components/header';
-import { useAuthContext } from '@/context/auth';
+import { useAuthContext } from '@/contexts/auth';
 
 const HomePage = () => {
     const { user, isInitializing } = useAuthContext();

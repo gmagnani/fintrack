@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
 import {
     PiggyBankIcon,
     TrendingDownIcon,
@@ -7,47 +6,40 @@ import {
 } from 'lucide-react';
 import { useSearchParams } from 'react-router';
 
-import { useAuthContext } from '@/context/auth';
-import { UserService } from '@/services/user';
+import { useGetUserBalance } from '@/api/hooks/user';
 
 import BalanceItem from './balance-item';
 
 const Balance = () => {
-    const { user } = useAuthContext();
     const [searchParams] = useSearchParams();
-    const { data } = useQuery({
-        queryKey: ['balance', user.id],
-        queryFn: () =>
-            UserService.getBalance({
-                from: searchParams.get('from'),
-                to: searchParams.get('to'),
-            }),
-    });
+    const from = searchParams.get('from'); // YYYY-MM-DD
+    const to = searchParams.get('to'); // YYYY-MM-DD
+    const { data } = useGetUserBalance({ from, to });
     return (
         <div className="grid grid-cols-2 grid-rows-2 gap-6">
             <BalanceItem
-                icon={<WalletIcon size={20} />}
-                title="Saldo"
-                value={data?.balance}
+                label="Saldo"
+                amount={data?.balance}
+                icon={<WalletIcon size={16} />}
             />
             <BalanceItem
+                label="Ganhos"
+                amount={data?.earnings}
                 icon={
-                    <TrendingUpIcon className="text-primary-green" size={20} />
+                    <TrendingUpIcon className="text-primary-green" size={16} />
                 }
-                title="Ganhos"
-                value={data?.earnings}
             />
             <BalanceItem
+                label="Gastos"
+                amount={data?.expenses}
                 icon={
-                    <TrendingDownIcon className="text-primary-red" size={20} />
+                    <TrendingDownIcon className="text-primary-red" size={16} />
                 }
-                title="Despesas"
-                value={data?.expenses}
             />
             <BalanceItem
-                icon={<PiggyBankIcon className="text-primary-blue" size={20} />}
-                title="Investimentos"
-                value={data?.investments}
+                label="Investimentos"
+                amount={data?.investments}
+                icon={<PiggyBankIcon className="text-primary-blue" size={16} />}
             />
         </div>
     );

@@ -5,11 +5,15 @@ import {
     LOCAL_STORAGE_REFRESH_TOKEN_KEY,
 } from '@/constants/local-storage';
 
-export const api = axios.create({
+export const protectedApi = axios.create({
     baseURL: 'https://fullstackclub-finance-dashboard-api.onrender.com/api',
 });
 
-api.interceptors.request.use((request) => {
+export const publicApi = axios.create({
+    baseURL: 'https://fullstackclub-finance-dashboard-api.onrender.com/api',
+});
+
+protectedApi.interceptors.request.use((request) => {
     const accessToken = localStorage.getItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY);
     if (!accessToken) {
         return request;
@@ -18,40 +22,45 @@ api.interceptors.request.use((request) => {
     return request;
 });
 
-api.interceptors.response.use(
+protectedApi.interceptors.response.use(
     (response) => response,
     async (error) => {
-        const originalRequest = error.config;
+        const request = error.config;
+        const refreshToken = localStorage.getItem(
+            LOCAL_STORAGE_REFRESH_TOKEN_KEY
+        );
+        if (!refreshToken) {
+            return Promise.reject(error);
+        }
         if (
             error.response.status === 401 &&
-            !originalRequest._retry &&
-            originalRequest.url !== '/users/refresh-token'
+            !request._retry &&
+            !request.url.includes('/users/refresh-token')
         ) {
-            originalRequest._retry = true;
-            const refreshToken = localStorage.getItem(
-                LOCAL_STORAGE_REFRESH_TOKEN_KEY
-            );
-            if (!refreshToken) {
-                return Promise.reject(error);
-            }
+            request._retry = true;
             try {
-                const response = await api.post('/users/refresh-token', {
-                    refreshToken,
-                });
-                const { accessToken, refreshToken: newRefreshToken } =
-                    response.data;
+                const response = await protectedApi.post(
+                    '/users/refresh-token',
+                    {
+                        refreshToken,
+                    }
+                );
+                const newAccessToken = response.data.accessToken;
+                const newRefreshToken = response.data.refreshToken;
                 localStorage.setItem(
                     LOCAL_STORAGE_ACCESS_TOKEN_KEY,
-                    accessToken
+                    newAccessToken
                 );
                 localStorage.setItem(
                     LOCAL_STORAGE_REFRESH_TOKEN_KEY,
                     newRefreshToken
                 );
-                originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-                return api(originalRequest);
+                request.headers.Authorization = `Bearer ${newAccessToken}`;
+                return protectedApi(request);
             } catch (refreshError) {
-                return Promise.reject(refreshError);
+                localStorage.removeItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY);
+                localStorage.removeItem(LOCAL_STORAGE_REFRESH_TOKEN_KEY);
+                console.error(refreshError);
             }
         }
         return Promise.reject(error);
