@@ -53,7 +53,7 @@ export const TransactionService = {
         return response.data;
     },
     /**
-     * Retorna as transações do usuário autenticado.
+     * Deleta uma transação do usuário autenticado.
      * @param {Object} input
      * @param {string} input.id - ID da transação a ser deletada.
      */

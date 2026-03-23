@@ -15,11 +15,11 @@ export const useCreateTransaction = () => {
         mutationFn: (input) => TransactionService.create(input),
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: getUserBalanceQueryKey({ userId: user.id }),
+                queryKey: getUserBalanceQueryKey({ userId: user?.id }),
                 exact: false, // padrão
             });
             queryClient.invalidateQueries({
-                queryKey: getTransactionsQueryKey({ userId: user.id }),
+                queryKey: getTransactionsQueryKey({ userId: user?.id }),
             });
         },
     });
@@ -35,9 +35,9 @@ export const getTransactionsQueryKey = ({ userId, from, to }) => {
 export const useGetTransactions = ({ from, to }) => {
     const { user } = useAuthContext();
     return useQuery({
-        queryKey: getTransactionsQueryKey({ userId: user.id, from, to }),
+        queryKey: getTransactionsQueryKey({ userId: user?.id, from, to }),
         queryFn: () => TransactionService.getAll({ from, to }),
-        enabled: Boolean(from) && Boolean(to) && Boolean(user.id),
+        enabled: Boolean(from) && Boolean(to) && Boolean(user?.id),
     });
 };
 
@@ -51,10 +51,10 @@ export const useEditTransaction = () => {
         mutationFn: (input) => TransactionService.update(input),
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: getUserBalanceQueryKey({ userId: user.id }),
+                queryKey: getUserBalanceQueryKey({ userId: user?.id }),
             });
             queryClient.invalidateQueries({
-                queryKey: getTransactionsQueryKey({ userId: user.id }),
+                queryKey: getTransactionsQueryKey({ userId: user?.id }),
             });
         },
     });
@@ -66,14 +66,14 @@ export const useDeleteTransaction = (id) => {
     const queryClient = useQueryClient();
     const { user } = useAuthContext();
     return useMutation({
-        mutationKey: deleteTransactionMutationKey,
+        mutationKey: deleteTransactionMutationKey(id),
         mutationFn: () => TransactionService.delete({ id }),
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: getUserBalanceQueryKey({ userId: user.id }),
+                queryKey: getUserBalanceQueryKey({ userId: user?.id }),
             });
             queryClient.invalidateQueries({
-                queryKey: getTransactionsQueryKey({ userId: user.id }),
+                queryKey: getTransactionsQueryKey({ userId: user?.id }),
             });
         },
     });
